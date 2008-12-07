@@ -13,18 +13,17 @@ class DefaultPagePartsExtension < Radiant::Extension
       else
         config = {}
       end
-      default_filter = config["filter"].to_s.camelize
-      filter = ["SmartyPants", "Markdown", "Textile"].include?(default_filter) ? "#{default_filter}" : nil
-      if config["parts"].is_a?(Array) && config["parts"].size > 0
+      if config.is_a?(Array) && config.size > 0
         self.parts = []
-        config["parts"].each do |name|
+        config.each do |part|
+          default_filter = part['filter'].to_s.camelize
+          filter = ["SmartyPants", "Markdown", "Textile"].include?(default_filter) ? "#{default_filter}" : nil
+          name = part['name']
           self.parts << PagePart.new(:name => name, :filter_id => filter)
         end
       end
       original_parent_equals(parent)
     end
-    
-    
   end
 
 end
