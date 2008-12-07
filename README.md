@@ -2,9 +2,7 @@
 
 UPDATE: This extension has been modded to use YAML style config settings as opposed to comma separtated. You now have the ability to set the filter for page parts due to this change. It simply uses some code from the original default\_page\_parts extension by Andrea Franz of GravityBlast.
 
-This extension is a complete hack. It depends heavily upon how Radiant's PageController creates new pages. It overrides 
-
-Page#parent= to look for a 'page\_part\_config' page part that should contain a yaml formatted list of page parts to create in the new child page. As with most things in life, use it at your own risk.
+This extension is a complete hack. It depends heavily upon how Radiant's PageController creates new pages. It overrides Page#parent= to look for a 'page\_part\_config' page part that should contain a yaml formatted list of page parts to create in the new child page. As with most things in life, use it at your own risk.
 
 So it's a hack, but a useful one. Since this extension monkeypatches class Page, it doesn't require your parent page to have a specific Page Type. You're free to use it on parent pages that might be Mailers, Archives, or any other Page Type. 
 
