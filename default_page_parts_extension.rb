@@ -1,18 +1,28 @@
 class DefaultPagePartsExtension < Radiant::Extension
-  version "0.1"
-  description "Enables auto-creation of default page parts for a page's children"
-  url "http://github.com/santry/radiant-default-page-parts-extension"
-
-  Page.class_eval do
-    alias :original_parent_equals :parent=
-
-    def parent=(parent)
-      default_parts = parent.render_part('default_child_page_parts').strip.split(/\s*,\s*/)
-      default_parts.each do |name|
-        self.parts << PagePart.new(:name => name, :filter_id => Radiant::Config['defaults.page.filter'])
+  version "0.2"
+  description "Adds a default page part, or several, with default content."
+  url "http://github.com/kgautreaux/radiant-default-page-parts-extension" 
+  
+  Page.instance_eval do
+    def new_with_defaults(config = Radiant::Config)
+      # Check if config file exists
+      if File.exists?(File.join(File.dirname(__FILE__), "parts.yml"))
+        page = new
+        default_parts = YAML::load(File.open(File.join(File.dirname(__FILE__), "parts.yml"), "r"))
+        
+        # Set up the base parts
+        default_parts.each do |part|
+          page.parts << PagePart.new(:name => part['name'], :filter_id => (part['filter'] || config['defaults.page.filter']),
+                                      :content => part['content'])
+        end
+  
+        # Set the status
+        default_status = config['defaults.page.status']
+        page.status = Status[default_status] if default_status
+        page
+      else
+        original_new_with_defaults(config)
       end
-      original_parent_equals(parent)
     end
   end
-
 end
