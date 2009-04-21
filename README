@@ -1,13 +1,28 @@
 = Default Page Parts
 
-This extension is a complete hack. It depends heavily upon how Radiant's PageController creates new pages. It overrides Page#parent= to look for a 'default_child_page_parts' page part that should contain a comma-separated list of page parts to create in the new child page. As with most things in life, use it at your own risk.
+This extension is a complete hack. It depends heavily upon the default page creation behavior of the Page class in Radiant > 0.6.9. It overrides Page.new_with_defaults to look for the file parts.yml in the root extension directory (i.e. vendor/extensions/default_page_parts/parts.yml) that should contain a YAML formatted list of page parts to create in the new child page.
 
-So it's a hack, but a useful one. Since this extension monkeypatches class Page, it doesn't require your parent page to have a specific Page Type. You're free to use it on parent pages that might be Mailers, Archives, or any other Page Type. 
+*Important*: The configuration file parts.yml must contain at least one part (most likely named "body") or no page parts will be created.
+
+If the file parts.yml doesn't exist the old "new_with_defaults" method will be called and will use the defaults set in Radiant::Config['defaults.page.parts'].  So if you wish to return to the old behavior simply remove parts.yml or rename it.
+
+So it's a hack, but a useful one. Since this extension monkeypatches the singleton class of class Page, it applies to your pages globally and does not depend upon the page type. 
 
 = How to use it
 
-Let's say you want all pages under "Events" to have the page parts "location", "description" and "date" by default. Simply add a "default_child_page_parts" page part to the "Events" page. In the content of that page part, put 
+Let's say you want all pages to have a default comments part.  Simply edit or add to parts.yml thusly:
 
-location, description, date
+---
+- name: body
+  filter: textile
+- name: comments
+  filter: textile
+  content: "<r:snippet name='comments'/>" # or whatever you want the comments part to contain 
 
-then save the "Events" page. Now when you add children to the "Events" page, they will automagically have "location", "description" and "date" page parts ready and waiting to be filled out.
+Now save the file and restart your server. Now when you add children to the any page, the child will automagically have a "comments" page part which will include the text "<r:snippet name='comments'/>" by default.
+
+Note: You cannot currently confine the default parts to only children of a particular page.  This may change in the future.
+
+TODO:
+1.) Testing
+2.) Allow default parts for only children of a particular page.
