@@ -28,8 +28,7 @@ class DefaultPagePartsExtensionTest < Test::Unit::TestCase
   def test_new_page_should_contain_correct_parts
     p = Page.new_with_defaults
     assert !p.valid?
-    assert_equal(YAML::load(File.open(File.join(File.dirname(__FILE__), 'parts.yml'), 'r')).map { |params| PagePart.new(params) }.inspect,
-                  p.parts.inspect)
+    assert_equal(YAML::load(File.open(File.join(File.dirname(__FILE__), 'parts.yml'), 'r')).map { |x| PagePart.new(x) }.inspect, p.parts.inspect)
   end
   
   def test_initialization
