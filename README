@@ -1,6 +1,6 @@
 = Default Page Parts
 
-This extension is a complete hack. It depends heavily upon the default page creation behavior of the Page class in Radiant > 0.6.9. It overrides Page.new_with_defaults to look for the file parts.yml in the root extension directory (i.e. vendor/extensions/default_page_parts/parts.yml) that should contain a YAML formatted list of page parts to create in the new child page.
+This extension is a complete hack. It depends heavily upon the default page creation behavior of the Page class in Radiant > 0.6.9. It overrides Page.new_with_defaults to look for the file "parts.yml" in the root extension directory (i.e. vendor/extensions/default_page_parts/parts.yml) that should contain a YAML formatted list of page parts to create in the new child page.
 
 *Important*: The configuration file parts.yml must contain at least one part (most likely named "body") or no page parts will be created.
 
