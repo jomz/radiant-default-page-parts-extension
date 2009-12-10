@@ -24,7 +24,6 @@ class DefaultPagePartsExtension < Radiant::Extension
       begin
         unless parts.empty?
           config = YAML::load(parts)
-          log.debug(config)
           if config.is_a?(Array) && config.size > 0
             page = new
             config.each do |part|
