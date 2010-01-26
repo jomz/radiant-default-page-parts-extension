@@ -1,27 +1,44 @@
 class DefaultPagePartsExtension < Radiant::Extension
-  version "0.2"
-  description "Adds a default page part, or several, with default content."
-  url "http://github.com/kgautreaux/radiant-default-page-parts-extension" 
+  version "0.3"
+  description "Enables auto-creation of default page parts for a page's children"
+  url "http://github.com/ckirby/radiant-default-page-parts-extension"
   
-  Page.instance_eval do
-    def new_with_defaults(config = Radiant::Config)
-      # Check if config file exists
-      if File.exists?(File.join(File.dirname(__FILE__), "parts.yml"))
-        page = new
-        default_parts = YAML::load(File.open(File.join(File.dirname(__FILE__), "parts.yml"), "r"))
-        
-        # Set up the base parts
-        default_parts.each do |part|
-          page.parts << PagePart.new(:name => part['name'], :filter_id => (part['filter'] || config['defaults.page.filter']),
-                                      :content => part['content'])
-        end
-  
-        # Set the status
-        default_status = config['defaults.page.status']
-        page.status = Status[default_status] if default_status
-        page
+  Admin::PagesController.class_eval do
+    alias :original_new :new
+    
+    def new
+      unless params[:page_id].blank?
+        parent_page = Page.find(params[:page_id]);
+        child_parts = parent_page.render_part("page_part_config")
+        self.model = model_class.new_with_page_parts(config, child_parts)
       else
-        original_new_with_defaults(config)
+        self.model = model_class.new_with_defaults(config)
+        self.model.slug = '/'
+      end
+      response_for :singular
+    end
+  end
+  
+  class << Page
+    def new_with_page_parts(config = Radiant::Config, parts = String)
+      begin
+        unless parts.empty?
+          config = YAML::load(parts)
+          if config.is_a?(Array) && config.size > 0
+            page = new
+            config.each do |part|
+              default_filter = part['filter'].to_s.camelize
+              filter = ["SmartyPants", "Markdown", "Textile"].include?(default_filter) ? "#{default_filter}" : nil
+              name = part['name']
+              page.parts << PagePart.new(:name => name, :filter_id => filter)
+            end
+            page
+          end
+        else
+          new_with_defaults(config)
+        end
+      rescue
+        new_with_defaults(config)
       end
     end
   end
